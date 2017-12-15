@@ -1,0 +1,36 @@
+body {
+    postion: absolute;
+    font-family: Times;
+    padding-left: 20px;
+    overflow: scroll;
+}
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent; /* make scrollbar transparent */
+}
+h1 {
+    //color: blue;
+    padding-left: 25px;
+}
+#titlesDivId{
+    margin-bottom: 1000px;
+}
+#solDivId {
+    margin-bottom: 1000px;
+}
+#hexDivId {
+    margin-bottom: 1000px;
+}
+.poemTitle {
+    text-decoration: underline;
+    font-size: 110%;
+    margin-bottom: 0px;
+}
+.poem {
+    margin-bottom: 40px;
+    padding-left: 40px;
+}
+.topHeader {
+    padding-left: 0px;
+    font-size: 80%;
+}
