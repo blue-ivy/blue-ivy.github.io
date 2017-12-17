@@ -35,3 +35,6 @@ h1 {
     padding-left: 0px;
     font-size: 80%;
 }
+input {
+    background-color: white;
+}
