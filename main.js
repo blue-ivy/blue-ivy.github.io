@@ -223,6 +223,12 @@ $(document).ready(function(){
     $("#hexHeaderId").on("click", function(){
         animatedScrollTo("#hexDivId");
     });
+    $("#matchsticksHeaderId").on("click", function(){
+        animatedScrollTo("#matchsticksDivId");
+    });
+    $("#dailyHeaderId").on("click", function(){
+        animatedScrollTo("#dailyDivId");
+    });
     $("#meHeaderId").on("click", function(){
         animatedScrollTo("#meDivId");
     });
