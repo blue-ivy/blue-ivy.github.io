@@ -241,6 +241,12 @@ $(document).ready(function(){
     $("#meTopHeaderId").on("click", function(){
         animatedScrollTo("#titlesDivId");
     });
+   $("#matchsticksTopHeaderId").on("click", function(){
+        animatedScrollTo("#titlesDivId");
+    });
+    $("#dailyTopHeaderId").on("click", function(){
+        animatedScrollTo("#titlesDivId");
+    });
     $("#meInputId").on("click", function(){
         pushPoem(buildAPoem());
     });
