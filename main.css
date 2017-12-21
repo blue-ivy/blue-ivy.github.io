@@ -23,6 +23,15 @@ h1 {
 #hexDivId {
     margin-bottom: 1000px;
 }
+#matchsticksDivId {
+    margin-bottom: 1000px;
+}
+#dailyDivId {
+    margin-bottom: 1000px;
+}
+#meDivId {
+    margin-bottom: 1000px;
+}
 .poemTitle {
     text-decoration: underline;
     font-size: 110%;
