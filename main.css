@@ -13,6 +13,7 @@ h1 {
     padding-left: 25px;
     font-size: 280%;
     font-style: oblique;
+    cursor: crosshair;
 }
 #titlesDivId {
     margin-bottom: 1000px;
