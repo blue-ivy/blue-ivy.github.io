@@ -60,6 +60,8 @@ function buildAPoem() {
                     if (next === "." || (Math.random() > 0.7 && next === "<br>")){
                         building = 0
                     }
+		    // remove the match
+		    trigrams.splice(i,1)
                     i = trigrams.length;
                     console.log("added " + next)
                 }
