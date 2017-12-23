@@ -57,9 +57,11 @@ function buildAPoem() {
                 if (trigrams[i][0] == prefix[0] && trigrams[i][1] == prefix[1]){
                     var next = trigrams[i][2]
                     poem.push(next)
-                    if (next === "." || (Math.random() > 0.7 && next === "<br>")){
+                    if (next === "." || (Math.random() > 0.8 && next === "<br>")){
                         building = 0
                     }
+					// remove the match
+					trigrams.splice(i,1)
                     i = trigrams.length;
                     console.log("added " + next)
                 }
