@@ -22,10 +22,11 @@ function buildAPoem() {
         // we want all the <br>s
         me += this.innerHTML;
     });
-    var tokens = me.replace( /\n/g, " " ).split(" ");
+    var tokens = me.replace( /\n/g, "" ).replace( /[.,?!]/g, " $& " ).replace( /(\s)+/g, " ").split(" ");
     for (i = 0; i < tokens.length; i++){
         tokens[i] = tokens[i].trim()
     }
+    console.log(tokens)
     // trigrams
     var trigrams = [];
     for (i = 0; i < (tokens.length - 2); i++) {
@@ -39,8 +40,12 @@ function buildAPoem() {
     trigrams = shuffle(trigrams);
     // CONSTRUCT //
     // MARKOV!!! //
-    var poem = trigrams[Math.floor(Math.random() * (trigrams.length - 1))]
-    var building = 1
+    // we're going to start with trigrams where the first index is uppercase
+    var startingPosition = getAnUppercaseIndex(trigrams);
+    var poem = trigrams[startingPosition];
+    trigrams.splice(startingPosition, 1);
+    console.log("starting with " + poem);
+    var building = 1;
     while (building > 0){
         building++;
         // the way this works, we only need to
@@ -50,29 +55,36 @@ function buildAPoem() {
         // FUN CASE!
         if (prefix[0] == prefix[1] && prefix[0] === "<br>"){
             // double break, lets start fesh
-            poem.concat(trigrams[Math.floor(Math.random() * (trigrams.length - 1))])
-            console.log("concat!")
+            var randIndex = getAnUppercaseIndex(trigrams)
+            poem = poem.concat(trigrams[randIndex])
+            rep = trigrams.splice(randIndex,1)
+            console.log("concat! " + rep)
         } else {
             for (i = 0; i < trigrams.length; i++) {
                 if (trigrams[i][0] == prefix[0] && trigrams[i][1] == prefix[1]){
                     var next = trigrams[i][2]
                     poem.push(next)
-                    if (next === "." || (Math.random() > 0.7 && next === "<br>")){
+                    if ((Math.random() > 0.8 && next === ".") || (Math.random() > 0.8 && next === "<br>")){
                         building = 0
                     }
-		    // remove the match
-		    trigrams.splice(i,1)
+                    // remove the match
+                    rep = trigrams.splice(i,1)
                     i = trigrams.length;
-                    console.log("added " + next)
+                    console.log("trigram " + rep)
                 }
             }
         }
-        console.log(poem);
     }
+    console.log(poem);
     // human readable
-    var outputPoem = ""
-    for (i = 0; i < poem.length; i++){
-        outputPoem += poem[i] + " ";
+    var outputPoem = poem[0]
+    for (i = 1; i < poem.length; i++){
+        // no space before punctuation
+        if(poem[i].match(/[.,?!]/g)){
+            outputPoem += poem[i];
+        } else {
+            outputPoem += " " + poem[i];
+        }
     }
     return outputPoem;
 }
@@ -92,6 +104,18 @@ function shuffle(array) {
     array[randomIndex] = temporaryValue;
   }
   return array;
+}
+
+function getAnUppercaseIndex(arr){
+    var startingPosition = -1;
+    for (i = 0; i < arr.length; i++){
+        // first letter of the first gram is uppercase
+        if (arr[i][0].substring(0,1).match(/[A-Z]/g)){
+            startingPosition = i;
+            i = arr.length + 1;
+        }
+    }
+    return startingPosition;
 }
 
 
