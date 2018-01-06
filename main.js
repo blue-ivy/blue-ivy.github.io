@@ -18,6 +18,7 @@ function buildAPoem() {
     // Here, I assume 1 returned sentence, tri-gram, and only my work on the site
     // (starting simple. Id like to add rigor and short brown leather chairs here as well)
     var me = "";
+    var GRAM_LENGTH = 4;
     $(".poem").each( function(i) {
         // we want all the <br>s
         me += this.innerHTML;
@@ -27,23 +28,25 @@ function buildAPoem() {
         tokens[i] = tokens[i].trim()
     }
     console.log(tokens)
-    // trigrams
-    var trigrams = [];
-    for (i = 0; i < (tokens.length - 2); i++) {
+    // grams
+    var grams = [];
+    for (i = 0; i < (tokens.length - (GRAM_LENGTH - 1)); i++) {
         var temp = [];
-        temp.push(tokens[i]);
-        temp.push(tokens[i + 1]);
-        temp.push(tokens[i + 2]);
-        trigrams.push(temp);
+        // dynamic gram size
+        for (j = 0; j < GRAM_LENGTH; j++){
+            temp.push(tokens[i + j])
+        }
+        grams.push(temp);
     }
     // shuffle
-    trigrams = shuffle(trigrams);
+    grams = shuffle(grams);
     // CONSTRUCT //
     // MARKOV!!! //
-    // we're going to start with trigrams where the first index is uppercase
-    var startingPosition = getAnUppercaseIndex(trigrams);
-    var poem = trigrams[startingPosition];
-    trigrams.splice(startingPosition, 1);
+    // we're going to start with grams where the first index is uppercase
+    var startingPosition = getAnUppercaseIndex(grams);
+    var poem = grams[startingPosition];
+    // pull out added grams
+    grams.splice(startingPosition, 1);
     console.log("starting with " + poem);
     var building = 1;
     while (building > 0){
@@ -51,27 +54,42 @@ function buildAPoem() {
         // the way this works, we only need to
         // match the first 2 (trigram) strings,
         // then we take the last one and add it to our poem
-        var prefix = [poem[poem.length - 2], poem[poem.length - 1]]
+        var prefix = poem.slice((GRAM_LENGTH - 1) * -1)
         // FUN CASE!
-        if (prefix[0] == prefix[1] && prefix[0] === "<br>"){
-            // double break, lets start fesh
-            var randIndex = getAnUppercaseIndex(trigrams)
-            poem = poem.concat(trigrams[randIndex])
-            rep = trigrams.splice(randIndex,1)
+        // if we have 2 line breaks back to back at the end of our 'prefix'
+        // lets start with a brand new gram
+        if (prefix[prefix.length - 2] == prefix[prefix.length - 1] && prefix[prefix.length - 2] === "<br>"){
+            var randIndex = getAnUppercaseIndex(grams)
+            poem = poem.concat(grams[randIndex])
+            rep = grams.splice(randIndex,1)
             console.log("concat! " + rep)
         } else {
-            for (i = 0; i < trigrams.length; i++) {
-                if (trigrams[i][0] == prefix[0] && trigrams[i][1] == prefix[1]){
-                    var next = trigrams[i][2]
+            for (i = 0; i < grams.length; i++) {
+                var match = 0;
+                // running total of matches,
+                // must equal GRAM_LENGTH-1 to add to poem
+                for (j = 0; j < GRAM_LENGTH; j ++){
+                    if (grams[i][j] == prefix[j]){
+                        match++;
+                    }
+                }
+                if (match == (GRAM_LENGTH - 1)){
+                    var next = grams[i][GRAM_LENGTH - 1]
                     poem.push(next)
-                    if ((Math.random() > 0.8 && next === ".") || (Math.random() > 0.8 && next === "<br>")){
+                    if ((Math.random() > 0.6 && next === "." && poem.length > 5)){
                         building = 0
                     }
                     // remove the match
-                    rep = trigrams.splice(i,1)
-                    i = trigrams.length;
-                    console.log("trigram " + rep)
+                    rep = grams.splice(i,1)
+                    i = grams.length;
+                    console.log("gram: (" + rep + ")")
                 }
+            }
+            // if we get through the corpus and didn't find a match then we've
+            // probably consumed most ofthe text. It would be good to back-up and
+            // try again here, but for now let's just end the poem...
+            if (match < (GRAM_LENGTH-1)){
+                building = 0
             }
         }
     }
