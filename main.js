@@ -15,66 +15,137 @@ function buildAPoem() {
     // n = number of gram-sentences returned
     // m = the bi,tri, or n-gram length
     // and the file(s) it should build from
-    // Here, I assume 1 returned sentence, tri-gram, and only my work on the site
-    // (starting simple. Id like to add rigor and short brown leather chairs here as well)
+    // Here, I assume 1 returned poem , gram length 4, and only my work on the site
     var me = "";
+    var GRAM_LENGTH = 4;
     $(".poem").each( function(i) {
         // we want all the <br>s
         me += this.innerHTML;
     });
-    var tokens = me.replace( /\n/g, " " ).split(" ");
+    var tokens = me.replace( /\n/g, "" ).replace( /[.,?!]/g, " $& " ).replace( /(\s)+/g, " ").split(" ");
     for (i = 0; i < tokens.length; i++){
         tokens[i] = tokens[i].trim()
     }
-    // trigrams
-    var trigrams = [];
-    for (i = 0; i < (tokens.length - 2); i++) {
+    //console.log(tokens)
+    // grams
+    var grams = [];
+    for (i = 0; i < (tokens.length - (GRAM_LENGTH - 1)); i++) {
         var temp = [];
-        temp.push(tokens[i]);
-        temp.push(tokens[i + 1]);
-        temp.push(tokens[i + 2]);
-        trigrams.push(temp);
+        // dynamic gram size
+        for (j = 0; j < GRAM_LENGTH; j++){
+            temp.push(tokens[i + j])
+        }
+        grams.push(temp);
     }
     // shuffle
-    trigrams = shuffle(trigrams);
+    grams = shuffle(grams);
     // CONSTRUCT //
     // MARKOV!!! //
-    var poem = trigrams[Math.floor(Math.random() * (trigrams.length - 1))]
-    var building = 1
+    // we're going to start with grams where the first index is uppercase
+    var startingPosition = getAnUppercaseIndex(grams);
+    var poem = grams[startingPosition];
+    // pull out added grams
+    grams.splice(startingPosition, 1);
+    console.log("starting with " + poem);
+    var building = 1;
     while (building > 0){
         building++;
         // the way this works, we only need to
-        // match the first 2 (trigram) strings,
+        // match the first 2 (gram) strings,
         // then we take the last one and add it to our poem
-        var prefix = [poem[poem.length - 2], poem[poem.length - 1]]
+        var prefix = poem.slice((GRAM_LENGTH - 1) * -1)
         // FUN CASE!
-        if (prefix[0] == prefix[1] && prefix[0] === "<br>"){
-            // double break, lets start fesh
-            poem.concat(trigrams[Math.floor(Math.random() * (trigrams.length - 1))])
-            console.log("concat!")
+        // if we have 2 line breaks back to back at the end of our 'prefix'
+        // lets start with a brand new gram
+        if (prefix[prefix.length - 2] == prefix[prefix.length - 1] && prefix[prefix.length - 2] === "<br>"){
+            var randIndex = getAnUppercaseIndex(grams)
+            poem = poem.concat(grams[randIndex])
+            rep = grams.splice(randIndex,1)
+            console.log("concat! " + rep)
         } else {
-            for (i = 0; i < trigrams.length; i++) {
-                if (trigrams[i][0] == prefix[0] && trigrams[i][1] == prefix[1]){
-                    var next = trigrams[i][2]
-                    poem.push(next)
-                    if (next === "." || (Math.random() > 0.8 && next === "<br>")){
-                        building = 0
+			// posNext array contains
+			// 	0: string
+			//	1: index in array (for removal)
+			//	2: % match
+			var posNext = [];
+            for (i = 0; i < grams.length; i++) {
+                var match = 0;
+                // here is our closeness measurement
+				// I'm using a weighted sum, where the closer the
+				// matched word is to the end of the string the more 
+				// significant the match is. This is represented 
+				// by the +(index + 1) for each matched word
+				// max match is factorial(GRAM_LENGTH)
+                for (j = 0; j < GRAM_LENGTH; j++){
+                    if (grams[i][j] == prefix[j]){
+                        match += (j + 1);
                     }
-					// remove the match
-					trigrams.splice(i,1)
-                    i = trigrams.length;
-                    console.log("added " + next)
                 }
+				// let's get crafty. I'm having problems over line breaks,
+				// so lets extend our memory if we're enjambing. This is because of scenrios like:
+				// 	(',', '<br>') on trigrams.
+				if (prefix[prefix.length - 1] == '<br>'){
+					if (match == fact(GRAM_LENGTH - 1)){
+						var next = grams[i][GRAM_LENGTH - 1];
+						posNext.push([next,i,match]);
+					}
+				} else {
+					if (match > 3) {
+						var next = grams[i][GRAM_LENGTH - 1];
+						posNext.push([next,i,match]);
+					}
+				}
             }
+            // if we get through the corpus and didn't find a match then we've
+            // probably consumed the whole text. It would be good to back-up and
+            // try again here, but for now let's just end the poem...
+            if (posNext.length == 0){
+                building = 0;
+            } else {
+				// pick one from possible next
+				var selected = selectFromPossbileMatches(posNext);
+				poem.push(selected[0]);
+				// remove the pick
+				rep = grams.splice(selected[1],1);
+				console.log("Selected: " + selected[0]);
+				if (Math.random() > 0.5 && (selected[0] === "." || selected[0] === "?" || selected[0] === "!")){
+					building = 0;
+				}
+			}
         }
-        console.log(poem);
     }
+    console.log("poem: " + poem);
     // human readable
-    var outputPoem = ""
-    for (i = 0; i < poem.length; i++){
-        outputPoem += poem[i] + " ";
+    var outputPoem = poem[0];
+    for (i = 1; i < poem.length; i++){
+        // no space before punctuation
+        if(poem[i].match(/[.,?!]/g)){
+            outputPoem += poem[i];
+        } else {
+            outputPoem += " " + poem[i];
+        }
     }
     return outputPoem;
+}
+
+function selectFromPossbileMatches(arr){
+	var sorted = arr.sort((function cmprWeights(a,b){return a[2] - b[2]}));
+	console.log("Sorted matches:");
+	console.log(sorted);
+	// lets pick a random value from 1-SUM(weights) 
+	// and return the corresponding value as the selected
+	var total = 0;
+	for (var a in sorted){
+		total += a[2];
+	}
+	var chosenWeight = Math.round(Math.random() * total);
+	for (var b in sorted){
+		chosenWeight -= b[2];
+		if (chosenWeight <= 0){
+			return b;
+		}
+	}
+	return sorted[sorted.length - 1];
 }
 
 // why is there no built-in function for this js?
@@ -94,119 +165,24 @@ function shuffle(array) {
   return array;
 }
 
+function getAnUppercaseIndex(arr){
+    var startingPosition = -1;
+    for (i = 0; i < arr.length; i++){
+        // first letter of the first gram is uppercase
+        if (arr[i][0].substring(0,1).match(/[A-Z]/g)){
+            startingPosition = i;
+            i = arr.length + 1;
+        }
+    }
+    return startingPosition;
+}
 
-/*
-        I wrote this in another life, see my other github, MichaelIV.
-        import sys
-        import re
-        import json
-        import random as rand
-
-
-        def run(n, m, *argv):
-            huge_list = []
-            for f in argv:
-                this_file = open(f)
-                for ln in this_file:
-                    # \n
-                    ln = ln.strip()
-                    if ln is not "":
-                        # splits on words
-                        words = re.split('([\w\'\-]+)', ln)
-                        # delete spaces and empty strings
-                        words = [w for w in words
-                                 if (w is not " " and
-                                     w is not "" and
-                                     w is not '"')]
-                        for w in words:
-                            huge_list.append(w)
-
-            tokens = make_ngram(huge_list, n)
-            for i in range(m):
-                out = ""
-                for w in markov(tokens, n):
-                    out += str(w) + " "
-                print(out)
-
-
-        def make_ngram(input_list, n):
-            # amazing line, found, online > list(zip(*[input_list[i:] for i in range(n)]))
-            # http://locallyoptimal.com/blog/2013/01/20/elegant-n-gram-generation-in-python/
-            gram = list(zip(*[input_list[i:] for i in range(n)]))
-            # add on a base frequency,on the list
-            # start at 0 because we'll match ourselves in this alg
-            gram = [list(i) for i in gram]
-
-            # print(gram)
-            # print(json.dumps(input_dict, indent=3))
-            return gram
-
-
-        def markov(tokens, n):
-            # Start generating
-            # tokens is an n-gram
-            # we want this to be shuffled before start
-            rand.shuffle(tokens)
-            phrase = []
-            # starting point is a word that followed a '.','?','!'
-            punct = rand.randint(0, 3);
-            start = "."
-            if punct == 1:
-                start = "?"
-            if punct == 2:
-                start = "!"
-            # get first n-length phrase to start
-            for gram in tokens:
-                if gram[0] == start:
-                    phrase = list(gram)[1:]
-                    if "." in phrase or "?" in phrase or "!" in phrase:
-                        return list(phrase)
-                    break
-
-            while True:
-                # take the last n-1 words in the
-                # phrase and match them to another
-                # - on first run, takes whole phrase
-                window = phrase[-(n - 1):]
-                swap = window.copy()
-                # this match limits the list to grams that
-                # have the same first word that as our window
-                for match in [gram for gram in tokens if gram[0] == window[0]]:
-                    m = list(match)
-                    if m[:-1] == window:
-                        phrase.append(m[n - 1])
-                        window = phrase[-(n - 1):]
-                        rand.shuffle(tokens)
-                    # If we've picked up a punctuation mark
-                    # lets break here
-                    if phrase[-1] is "?" or phrase[-1] is "!" or phrase[-1] is ".":
-                        return list(phrase)
-                if swap == window:
-                    # we're stuck
-                    # best course of action here is to redo
-                    phrase = []
-                    punct = rand.randint(0, 3);
-                    start = "."
-                    if punct == 1:
-                        start = "?"
-                    if punct == 2:
-                        start = "!"
-                    for gram in tokens:
-                        if gram[0] == start:
-                            phrase = list(gram)[1:]
-                            if "." in phrase or "?" in phrase or "!" in phrase:
-                                return list(phrase)
-                            break
-
-
-        if __name__ == "__main__":
-            if len(sys.argv) >= 2:
-                run(int(sys.argv[1]), int(sys.argv[2]), sys.argv[3])
-            else:
-                print("try: ngram.py [gram-size] [number of output sentences] [file.txt]")
-*/
-
-
+function fact(num){
+	if (num > 1){
+		return fact(num - 1) + num;
+	}
+	return num;
+}
 
 
 

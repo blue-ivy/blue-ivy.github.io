@@ -33,6 +33,12 @@ h1 {
 #meDivId {
     margin-bottom: 1000px;
 }
+#twitterDivId {
+    color: blue;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
 .poemTitle {
     text-decoration: underline;
     font-size: 110%;
