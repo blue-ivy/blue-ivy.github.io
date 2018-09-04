@@ -39,6 +39,13 @@ h1 {
     font-size: 12px;
     font-weight: bold;
 }
+
+#instagramDivId {
+    color: pink;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: bold;
+}
 .poemTitle {
     text-decoration: underline;
     font-size: 110%;
