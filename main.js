@@ -195,11 +195,14 @@ $(document).ready(function(){
 		<h1 id="hexHeaderId" >Hex</h1>
 		<h1 id="aboutHeaderId" >Me</h1>
     */
-    $("#solHeaderId").on("click", function(){
-        animatedScrollTo("#solDivId");
+    $("#debtHeaderId").on("click", function(){
+        animatedScrollTo("#debtDivId");
     });
     $("#hexHeaderId").on("click", function(){
         animatedScrollTo("#hexDivId");
+    });
+    $("#solHeaderId").on("click", function(){
+        animatedScrollTo("#solDivId");
     });
     $("#matchsticksHeaderId").on("click", function(){
         animatedScrollTo("#matchsticksDivId");
@@ -210,10 +213,13 @@ $(document).ready(function(){
     $("#meHeaderId").on("click", function(){
         animatedScrollTo("#meDivId");
     });
-    $("#solTopHeaderId").on("click", function(){
+    $("#debtTopHeaderId").on("click", function(){
         animatedScrollTo("#titlesDivId");
     });
     $("#hexTopHeaderId").on("click", function(){
+        animatedScrollTo("#titlesDivId");
+    });
+    $("#solTopHeaderId").on("click", function(){
         animatedScrollTo("#titlesDivId");
     });
     $("#meTopHeaderId").on("click", function(){
