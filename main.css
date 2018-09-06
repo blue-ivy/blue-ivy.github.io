@@ -18,10 +18,13 @@ h1 {
 #titlesDivId {
     margin-bottom: 1000px;
 }
-#solDivId {
+#debtDivId {
     margin-bottom: 1000px;
 }
 #hexDivId {
+    margin-bottom: 1000px;
+}
+#solDivId {
     margin-bottom: 1000px;
 }
 #matchsticksDivId {
