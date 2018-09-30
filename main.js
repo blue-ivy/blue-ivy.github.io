@@ -1,5 +1,3 @@
-
-
 function animatedScrollTo(element){
     $('html, body').animate({
         scrollTop: $(element).offset().top - 40
