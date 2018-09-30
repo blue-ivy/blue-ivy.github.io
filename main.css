@@ -56,6 +56,12 @@ h1 {
 	margin: auto;
     width: 50%;
 }
+#globalGoHomeId {
+    font-size: 250%;
+    font-style: oblique;
+    cursor: help;
+	color: #ffccff;
+}
 .frontPageLink {
 	 color: black;
 }
