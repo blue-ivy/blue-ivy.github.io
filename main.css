@@ -49,6 +49,16 @@ h1 {
     font-size: 12px;
     font-weight: bold;
 }
+#frontPageDiv {
+    font-size: 280%;
+    font-style: oblique;
+    cursor: help;
+	margin: auto;
+    width: 50%;
+}
+.frontPageLink {
+	 color: black;
+}
 .poemTitle {
     text-decoration: underline;
     font-size: 110%;
