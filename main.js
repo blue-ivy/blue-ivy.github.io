@@ -214,7 +214,7 @@ $(document).ready(function(){
     $("#meHeaderId").on("click", function(){
         animatedScrollTo("#meDivId");
     });
-    $(".topHeader").on("click", function(){
+    $(".backToTop").on("click", function(){
         animatedScrollTo("#titlesDivId");
     });
     $("#meInputId").on("click", function(){
