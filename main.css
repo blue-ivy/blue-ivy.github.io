@@ -79,10 +79,11 @@ h1 {
     margin-bottom: 40px;
     padding-left: 40px;
 }
-.topHeader {
+.backToTop {
     padding-left: 0px;
     font-size: 80%;
 }
+
 input {
     background-color: white;
 }
