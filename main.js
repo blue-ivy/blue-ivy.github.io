@@ -205,28 +205,16 @@ $(document).ready(function(){
     $("#matchsticksHeaderId").on("click", function(){
         animatedScrollTo("#matchsticksDivId");
     });
+    $("#weekliesHeaderId").on("click", function(){
+        animatedScrollTo("#weekliesDivId");
+    });
     $("#dailyHeaderId").on("click", function(){
         animatedScrollTo("#dailyDivId");
     });
     $("#meHeaderId").on("click", function(){
         animatedScrollTo("#meDivId");
     });
-    $("#debtTopHeaderId").on("click", function(){
-        animatedScrollTo("#titlesDivId");
-    });
-    $("#hexTopHeaderId").on("click", function(){
-        animatedScrollTo("#titlesDivId");
-    });
-    $("#solTopHeaderId").on("click", function(){
-        animatedScrollTo("#titlesDivId");
-    });
-    $("#meTopHeaderId").on("click", function(){
-        animatedScrollTo("#titlesDivId");
-    });
-   $("#matchsticksTopHeaderId").on("click", function(){
-        animatedScrollTo("#titlesDivId");
-    });
-    $("#dailyTopHeaderId").on("click", function(){
+    $(".topHeader").on("click", function(){
         animatedScrollTo("#titlesDivId");
     });
     $("#meInputId").on("click", function(){
